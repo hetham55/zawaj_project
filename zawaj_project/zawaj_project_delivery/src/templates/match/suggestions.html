@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اقتراحات التوافق - منصة تيسير الزواج</title>
+    <!-- Bootstrap RTL -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts - Tajawal -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .main-color {
+            color: #1A7B8C;
+        }
+        .bg-main {
+            background-color: #1A7B8C;
+            color: white;
+        }
+        .btn-main {
+            background-color: #1A7B8C;
+            color: white;
+        }
+        .btn-main:hover {
+            background-color: #156A79;
+            color: white;
+        }
+        .match-card {
+            border-radius: 10px;
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        .match-card:hover {
+            transform: translateY(-5px);
+        }
+        .match-img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #1A7B8C;
+        }
+        .match-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand main-color" href="{{ url_for('index') }}">
+                <i class="fas fa-heart me-2"></i>
+                منصة تيسير الزواج
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">الرئيسية</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('match.suggestions') }}">اقتراحات التوافق</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('match.search') }}">البحث</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('user.conversations') }}">المحادثات</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-1"></i>
+                            {{ current_user.username }}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="{{ url_for('user.profile') }}">الملف الشخصي</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('user.matches') }}">طلبات التوافق</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('user.support') }}">الدعم</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">تسجيل الخروج</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="container mt-3">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="container my-5">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold main-color">اقتراحات التوافق</h2>
+            <p class="lead text-muted">اقتراحات مخصصة بناءً على تفضيلاتك</p>
+        </div>
+
+        {% if suggestions %}
+            <div class="row g-4">
+                {% for suggestion in suggestions %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card match-card h-100 position-relative">
+                            {% if suggestion.is_verified %}
+                                <span class="badge bg-success match-badge">
+                                    <i class="fas fa-check-circle"></i> موثق
+                                </span>
+                            {% endif %}
+                            <div class="card-body text-center p-4">
+                                <img src="{{ url_for('static', filename=suggestion.profile.profile_picture or 'img/default-avatar.png') }}" alt="صورة المستخدم" class="match-img mb-3">
+                                <h5 class="card-title">{{ suggestion.profile.first_name or suggestion.username }}</h5>
+                                <p class="card-text text-muted mb-1">
+                                    {% if suggestion.profile.birth_date %}
+                                        {{ (current_date.year - suggestion.profile.birth_date.year) }} سنة
+                                    {% endif %}
+                                    {% if suggestion.profile.city %}
+                                        • {{ suggestion.profile.city }}
+                                    {% endif %}
+                                </p>
+                                <p class="card-text mb-3">
+                                    {% if suggestion.profile.marital_status %}
+                                        {% if suggestion.profile.marital_status.value == 'single' %}
+                                            <span class="badge bg-light text-dark">أعزب</span>
+                                        {% elif suggestion.profile.marital_status.value == 'divorced' %}
+                                            <span class="badge bg-light text-dark">مطلق</span>
+                                        {% elif suggestion.profile.marital_status.value == 'widowed' %}
+                                            <span class="badge bg-light text-dark">أرمل</span>
+                                        {% endif %}
+                                    {% endif %}
+                                    
+                                    {% if suggestion.profile.religious_level %}
+                                        {% if suggestion.profile.religious_level.value == 'conservative' %}
+                                            <span class="badge bg-light text-dark">محافظ</span>
+                                        {% elif suggestion.profile.religious_level.value == 'religious' %}
+                                            <span class="badge bg-light text-dark">متدين</span>
+                                        {% elif suggestion.profile.religious_level.value == 'committed' %}
+                                            <span class="badge bg-light text-dark">ملتزم</span>
+                                        {% endif %}
+                                    {% endif %}
+                                    
+                                    {% if suggestion.profile.education_level %}
+                                        <span class="badge bg-light text-dark">{{ suggestion.profile.education_level }}</span>
+                                    {% endif %}
+                                </p>
+                                <div class="d-grid gap-2">
+                                    <a href="{{ url_for('match.view_user', user_id=suggestion.id) }}" class="btn btn-outline-secondary">عرض الملف الشخصي</a>
+                                    <form action="{{ url_for('match.send_request', receiver_id=suggestion.id) }}" method="POST">
+                                        <button type="submit" class="btn btn-main w-100">إرسال طلب توافق</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h4>لا توجد اقتراحات متاحة حالياً</h4>
+                <p class="text-muted">يمكنك تحديث تفضيلاتك في الملف الشخصي للحصول على اقتراحات أكثر ملاءمة</p>
+                <div class="mt-3">
+                    <a href="{{ url_for('match.search') }}" class="btn btn-main">البحث عن شريك</a>
+                    <a href="{{ url_for('user.edit_profile') }}" class="btn btn-outline-secondary ms-2">تحديث التفضيلات</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <footer class="py-4 bg-dark text-white text-center">
+        <div class="container">
+            <p class="mb-0">&copy; 2025 منصة تيسير الزواج. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

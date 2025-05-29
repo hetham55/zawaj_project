@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة تيسير الزواج - الصفحة الرئيسية</title>
+    <!-- Bootstrap RTL -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts - Tajawal -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+        }
+        .main-color {
+            color: #1A7B8C;
+        }
+        .bg-main {
+            background-color: #1A7B8C;
+            color: white;
+        }
+        .btn-main {
+            background-color: #1A7B8C;
+            color: white;
+        }
+        .btn-main:hover {
+            background-color: #156A79;
+            color: white;
+        }
+        .hero-section {
+            background: linear-gradient(rgba(26, 123, 140, 0.8), rgba(26, 123, 140, 0.9)), url('{{ url_for("static", filename="img/hero-bg.jpg") }}');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 6rem 0;
+        }
+        .feature-card {
+            border-radius: 10px;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        .feature-icon {
+            font-size: 2.5rem;
+            color: #1A7B8C;
+            margin-bottom: 1rem;
+        }
+        .testimonial-card {
+            border-radius: 10px;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+        .testimonial-img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #1A7B8C;
+        }
+        .counter-box {
+            text-align: center;
+            padding: 2rem;
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+        .counter-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #1A7B8C;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand main-color" href="{{ url_for('index') }}">
+                <i class="fas fa-heart me-2"></i>
+                منصة تيسير الزواج
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('index') }}">الرئيسية</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">المميزات</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#how-it-works">كيف يعمل</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#testimonials">قصص نجاح</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    {% if current_user.is_authenticated %}
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle me-1"></i>
+                                {{ current_user.username }}
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li><a class="dropdown-item" href="{{ url_for('user.profile') }}">الملف الشخصي</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('match.suggestions') }}">اقتراحات التوافق</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('user.matches') }}">طلبات التوافق</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">تسجيل الخروج</a></li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary me-2">تسجيل الدخول</a>
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-main">إنشاء حساب</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="container mt-3">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <section class="hero-section">
+        <div class="container text-center">
+            <h1 class="display-4 fw-bold mb-4">توفيق رأسين بالحلال</h1>
+            <p class="lead mb-5">منصة إلكترونية آمنة وموثوقة تساعدك في العثور على شريك الحياة المناسب وفق معايير شرعية وقيم أصيلة</p>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('match.suggestions') }}" class="btn btn-light btn-lg px-4 gap-3">اقتراحات التوافق</a>
+                    <a href="{{ url_for('match.search') }}" class="btn btn-outline-light btn-lg px-4">البحث عن شريك</a>
+                {% else %}
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg px-4 gap-3">إنشاء حساب</a>
+                    <a href="#how-it-works" class="btn btn-outline-light btn-lg px-4">كيف يعمل</a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5" id="features">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold main-color">مميزات المنصة</h2>
+                <p class="lead text-muted">ما يميزنا عن غيرنا من منصات الزواج الإلكترونية</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h5 class="card-title">خصوصية وأمان</h5>
+                            <p class="card-text">تشفير كامل للبيانات الحساسة وإمكانية إخفاء المعلومات الشخصية حتى القبول المتبادل</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <h5 class="card-title">توثيق الحسابات</h5>
+                            <p class="card-text">نظام توثيق متكامل للتأكد من هوية المستخدمين وجدية الطلبات</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon">
+                                <i class="fas fa-handshake"></i>
+                            </div>
+                            <h5 class="card-title">توافق ذكي</h5>
+                            <p class="card-text">خوارزمية متطورة لاقتراح الشركاء المناسبين بناءً على معايير متعددة</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon">
+                                <i class="fas fa-user-friends"></i>
+                            </div>
+                            <h5 class="card-title">دور الوسطاء</h5>
+                            <p class="card-text">إمكانية مشاركة الأقارب والأصدقاء كوسطاء في عملية البحث والتوفيق</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <h5 class="card-title">إشراف دقيق</h5>
+                            <p class="card-text">فريق إشراف متخصص لمراجعة الملفات ومراقبة المحادثات وضمان الالتزام بالقيم</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon">
+                                <i class="fas fa-mosque"></i>
+                            </div>
+                            <h5 class="card-title">قيم إسلامية</h5>
+                            <p class="card-text">منصة تلتزم بالقيم والتعاليم الإسلامية في جميع مراحل التوفيق والتواصل</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5 bg-light" id="how-it-works">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold main-color">كيف تعمل المنصة</h2>
+                <p class="lead text-muted">خطوات بسيطة للعثور على شريك الحياة المناسب</p>
+            </div>
+            <div class="row align-items-center">
+                <div class="col-md-6 mb-4 mb-md-0">
+                    <img src="{{ url_for('static', filename='img/how-it-works.png') }}" alt="كيف تعمل المنصة" class="img-fluid rounded shadow">
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex mb-4">
+                        <div class="bg-main rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; flex-shrink: 0;">
+                            <h4 class="mb-0 text-white">1</h4>
+                        </div>
+                        <div>
+                            <h5>إنشاء حساب</h5>
+                            <p>قم بإنشاء حساب وملء بياناتك الشخصية وتفضيلاتك بكل دقة</p>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-4">
+                        <div class="bg-main rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; flex-shrink: 0;">
+                            <h4 class="mb-0 text-white">2</h4>
+                        </div>
+                        <div>
+                            <h5>توثيق الحساب</h5>
+                            <p>قم بتوثيق حسابك من خلال تقديم المستندات المطلوبة للتحقق من هويتك</p>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-4">
+                        <div class="bg-main rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; flex-shrink: 0;">
+                            <h4 class="mb-0 text-white">3</h4>
+                        </div>
+                        <div>
+                            <h5>استعراض الاقتراحات</h5>
+                            <p>استعرض اقتراحات التوافق المخصصة لك بناءً على تفضيلاتك</p>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-4">
+                        <div class="bg-main rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; flex-shrink: 0;">
+                            <h4 class="mb-0 text-white">4</h4>
+                        </div>
+                        <div>
+                            <h5>إرسال طلب توافق</h5>
+                            <p>أرسل طلب توافق للشخص المناسب وانتظر الموافقة المتبادلة</p>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <div class="bg-main rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; flex-shrink: 0;">
+                            <h4 class="mb-0 text-white">5</h4>
+                        </div>
+                        <div>
+                            <h5>التواصل بإشراف المنصة</h5>
+                            <p>بعد الموافقة المتبادلة، يمكنكما التواصل بإشراف المنصة للتعارف وترتيب اللقاء</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5 bg-main text-white">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="counter-box">
+                        <div class="counter-number">{{ stats.total_users }}</div>
+                        <p class="mb-0 text-muted">مستخدم مسجل</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="counter-box">
+                        <div class="counter-number">{{ stats.successful_matches }}</div>
+                        <p class="mb-0 text-muted">توافق ناجح</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="counter-box">
+                        <div class="counter-number">{{ stats.verified_users }}</div>
+                        <p class="mb-0 text-muted">حساب موثق</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="counter-box">
+                        <div class="counter-number">{{ stats.cities_count }}</div>
+                        <p class="mb-0 text-muted">مدينة مشمولة</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5" id="testimonials">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold main-color">قصص نجاح</h2>
+                <p class="lead text-muted">تجارب حقيقية من مستخدمي المنصة</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card testimonial-card h-100">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="{{ url_for('static', filename='img/testimonial-1.jpg') }}" alt="صورة المستخدم" class="testimonial-img me-3">
+                                <div>
+                                    <h5 class="card-title mb-0">أحمد وسارة</h5>
+                                    <p class="text-muted mb-0">الرياض</p>
+                                </div>
+                            </div>
+                            <p class="card-text">
+                                "بفضل الله ثم بفضل هذه المنصة، وجدت شريكة حياتي بعد بحث طويل. أعجبني مستوى الخصوصية والأمان في المنصة، وكان التوافق دقيقاً جداً. الآن نحن متزوجان منذ 6 أشهر ونعيش حياة سعيدة."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card testimonial-card h-100">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="{{ url_for('static', filename='img/testimonial-2.jpg') }}" alt="صورة المستخدم" class="testimonial-img me-3">
+                                <div>
+                                    <h5 class="card-title mb-0">نورة وعبدالله</h5>
+                                    <p class="text-muted mb-0">جدة</p>
+                                </div>
+                            </div>
+                            <p class="card-text">
+                                "كنت مترددة في البداية من فكرة التسجيل في منصة زواج، لكن وجدت هنا بيئة محترمة وآمنة. تعرفت على زوجي الحالي من خلال المنصة، وكان دور الوسيط (عمتي) مهماً جداً في تسهيل الأمور."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card testimonial-card h-100">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="{{ url_for('static', filename='img/testimonial-3.jpg') }}" alt="صورة المستخدم" class="testimonial-img me-3">
+                                <div>
+                                    <h5 class="card-title mb-0">محمد وفاطمة</h5>
+                                    <p class="text-muted mb-0">الدمام</p>
+                                </div>
+                            </div>
+                            <p class="card-text">
+                                "بعد تجارب سابقة غير موفقة في منصات أخرى، وجدت هنا الجدية والاحترام. أعجبني نظام التوثيق والإشراف الدقيق. تعرفت على زوجتي وكان التوافق بيننا كبيراً في القيم والأهداف."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5 bg-light">
+        <div class="container text-center">
+            <h2 class="fw-bold main-color mb-4">ابدأ رحلتك نحو الزواج الناجح</h2>
+            <p class="lead text-muted mb-4">سجل الآن واكتشف شريك حياتك المناسب</p>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('match.suggestions') }}" class="btn btn-main btn-lg px-4 gap-3">اقتراحات التوافق</a>
+                    <a href="{{ url_for('match.search') }}" class="btn btn-outline-secondary btn-lg px-4">البحث عن شريك</a>
+                {% else %}
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-main btn-lg px-4 gap-3">إنشاء حساب</a>
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary btn-lg px-4">تسجيل الدخول</a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-4 bg-dark text-white">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5 class="mb-3">منصة تيسير الزواج</h5>
+                    <p>منصة إلكترونية آمنة وموثوقة لتوفيق رأسين بالحلال، تمكّن الأفراد من العثور على شريك الحياة المناسب وفق معايير شرعية وقيم أصيلة.</p>
+                </div>
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5 class="mb-3">روابط سريعة</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{{ url_for('index') }}" class="text-white text-decoration-none">الرئيسية</a></li>
+                        <li class="mb-2"><a href="#features" class="text-white text-decoration-none">المميزات</a></li>
+                        <li class="mb-2"><a href="#how-it-works" class="text-white text-decoration-none">كيف يعمل</a></li>
+                        <li class="mb-2"><a href="#testimonials" class="text-white text-decoration-none">قصص نجاح</a></li>
+                        <li class="mb-2"><a href="{{ url_for('auth.register') }}" class="text-white text-decoration-none">إنشاء حساب</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="mb-3">تواصل معنا</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i> info@zawaj-platform.com</li>
+                        <li class="mb-2"><i class="fas fa-phone me-2"></i> +966 12 345 6789</li>
+                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> الرياض، المملكة العربية السعودية</li>
+                    </ul>
+                    <div class="mt-3">
+                        <a href="#" class="text-white me-3"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-facebook fa-lg"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-linkedin fa-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4 bg-light">
+            <div class="text-center">
+                <p class="mb-0">&copy; 2025 منصة تيسير الزواج. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

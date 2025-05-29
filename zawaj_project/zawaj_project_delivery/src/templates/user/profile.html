@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الملف الشخصي - منصة تيسير الزواج</title>
+    <!-- Bootstrap RTL -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts - Tajawal -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .main-color {
+            color: #1A7B8C;
+        }
+        .bg-main {
+            background-color: #1A7B8C;
+            color: white;
+        }
+        .btn-main {
+            background-color: #1A7B8C;
+            color: white;
+        }
+        .btn-main:hover {
+            background-color: #156A79;
+            color: white;
+        }
+        .profile-header {
+            background: linear-gradient(rgba(26, 123, 140, 0.8), rgba(26, 123, 140, 0.9)), url('{{ url_for("static", filename="img/profile-bg.jpg") }}');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 3rem 0;
+        }
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border: 5px solid white;
+            border-radius: 50%;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+        .profile-card {
+            border-radius: 10px;
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+        }
+        .nav-pills .nav-link.active {
+            background-color: #1A7B8C;
+        }
+        .nav-pills .nav-link {
+            color: #1A7B8C;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand main-color" href="{{ url_for('index') }}">
+                <i class="fas fa-heart me-2"></i>
+                منصة تيسير الزواج
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">الرئيسية</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('match.suggestions') }}">اقتراحات التوافق</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('match.search') }}">البحث</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('user.conversations') }}">المحادثات</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-1"></i>
+                            {{ user.username }}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="{{ url_for('user.profile') }}">الملف الشخصي</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('user.matches') }}">طلبات التوافق</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('user.support') }}">الدعم</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">تسجيل الخروج</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="container mt-3">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="profile-header">
+        <div class="container text-center">
+            <img src="{{ url_for('static', filename=profile.profile_picture or 'img/default-avatar.png') }}" alt="الصورة الشخصية" class="profile-img mb-3">
+            <h2 class="fw-bold">{{ profile.first_name or user.username }}</h2>
+            <p class="lead mb-0">
+                {% if user.user_type.value == 'male' %}
+                    ذكر (باحث عن زواج)
+                {% elif user.user_type.value == 'female' %}
+                    أنثى (باحثة عن زواج)
+                {% elif user.user_type.value == 'guardian' %}
+                    ولي أمر
+                {% elif user.user_type.value == 'mediator' %}
+                    وسيط
+                {% endif %}
+                {% if user.is_verified %}
+                    <span class="badge bg-success ms-2"><i class="fas fa-check-circle me-1"></i> موثق</span>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="card profile-card">
+                    <div class="card-header bg-main text-white">
+                        <h5 class="card-title mb-0">معلومات الحساب</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>اسم المستخدم</span>
+                                <span class="text-muted">{{ user.username }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>البريد الإلكتروني</span>
+                                <span class="text-muted">{{ user.email }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>رقم الجوال</span>
+                                <span class="text-muted">{{ user.phone }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>تاريخ التسجيل</span>
+                                <span class="text-muted">{{ user.created_at.strftime('%Y-%m-%d') }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>حالة الحساب</span>
+                                {% if user.is_active %}
+                                    <span class="badge bg-success">نشط</span>
+                                {% else %}
+                                    <span class="badge bg-danger">معطل</span>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ url_for('user.edit_profile') }}" class="btn btn-main w-100">تعديل الملف الشخصي</a>
+                    </div>
+                </div>
+
+                <div class="card profile-card mt-4">
+                    <div class="card-header bg-main text-white">
+                        <h5 class="card-title mb-0">روابط سريعة</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            <a href="{{ url_for('user.matches') }}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-handshake me-2"></i> طلبات التوافق
+                            </a>
+                            <a href="{{ url_for('user.conversations') }}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-comments me-2"></i> المحادثات
+                            </a>
+                            <a href="{{ url_for('user.verification') }}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-id-card me-2"></i> توثيق الحساب
+                            </a>
+                            <a href="{{ url_for('user.support') }}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-headset me-2"></i> الدعم
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="card profile-card">
+                    <div class="card-header bg-main text-white">
+                        <ul class="nav nav-pills card-header-pills">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="personal-tab" data-bs-toggle="tab" href="#personal">المعلومات الشخصية</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="preferences-tab" data-bs-toggle="tab" href="#preferences">التفضيلات</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="bio-tab" data-bs-toggle="tab" href="#bio">نبذة تعريفية</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="personal">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5 class="main-color mb-3">البيانات الأساسية</h5>
+                                        <table class="table">
+                                            <tbody>
+                                                <tr>
+                                                    <th>الاسم</th>
+                                                    <td>{{ profile.first_name or 'غير محدد' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>تاريخ الميلاد</th>
+                                                    <td>{{ profile.birth_date.strftime('%Y-%m-%d') if profile.birth_date else 'غير محدد' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>الجنسية</th>
+                                                    <td>{{ profile.nationality or 'غير محدد' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>المدينة</th>
+                                                    <td>{{ profile.city or 'غير محدد' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>الحالة الاجتماعية</th>
+                                                    <td>
+                                                        {% if profile.marital_status %}
+                                                            {% if profile.marital_status.value == 'single' %}
+                                                                أعزب
+                                                            {% elif profile.marital_status.value == 'divorced' %}
+                                                                مطلق
+                                                            {% elif profile.marital_status.value == 'widowed' %}
+                                                                أرمل
+                                                            {% endif %}
+                                                        {% else %}
+                                                            غير محدد
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>عدد الأبناء</th>
+                                                    <td>{{ profile.children_count or '0' }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5 class="main-color mb-3">الجوانب الدينية والقيمية</h5>
+                                        <table class="table">
+                                            <tbody>
+                                                <tr>
+                                                    <th>مستوى الالتزام</th>
+                                                    <td>
+                                                        {% if profile.religious_level %}
+                                                            {% if profile.religious_level.value == 'conservative' %}
+                                                                محافظ
+                                                            {% elif profile.religious_level.value == 'religious' %}
+                                                                متدين
+                                                            {% elif profile.religious_level.value == 'committed' %}
+                                                                ملتزم
+                                                            {% endif %}
+                                                        {% else %}
+                                                            غير محدد
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>المذهب</th>
+                                                    <td>{{ profile.religious_sect or 'غير محدد' }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <h5 class="main-color mb-3 mt-4">التعليم والعمل</h5>
+                                        <table class="table">
+                                            <tbody>
+                                                <tr>
+                                                    <th>المؤهل التعليمي</th>
+                                                    <td>{{ profile.education_level or 'غير محدد' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>التخصص</th>
+                                                    <td>{{ profile.specialization or 'غير محدد' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>المهنة الحالية</th>
+                                                    <td>{{ profile.occupation or 'غير محدد' }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>مستوى الدخل</th>
+                                                    <td>
+                                                        {% if profile.income_level %}
+                                                            {% if profile.income_level.value == 'low' %}
+                                                                أقل من 5 آلاف
+                                                            {% elif profile.income_level.value == 'medium' %}
+                                                                5 إلى 10 آلاف
+                                                            {% elif profile.income_level.value == 'high' %}
+                                                                أكثر من 10 آلاف
+                                                            {% endif %}
+                                                        {% else %}
+                                                            غير محدد
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="preferences">
+                                <h5 class="main-color mb-3">تفضيلات الزواج</h5>
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <th>الفئة العمرية المفضلة</th>
+                                            <td>{{ profile.preferred_age_min or '18' }} - {{ profile.preferred_age_max or '50' }} سنة</td>
+                                        </tr>
+                                        <tr>
+                                            <th>قبول تعدد الزوجات</th>
+                                            <td>{{ 'نعم' if profile.accepts_polygamy else 'لا' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>الرغبة في سكن مستقل</th>
+                                            <td>{{ 'نعم' if profile.wants_independent_housing else 'لا' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>قبول الزواج من جنسية مختلفة</th>
+                                            <td>{{ 'نعم' if profile.accepts_different_nationality else 'لا' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>قبول زواج المسيار</th>
+                                            <td>{{ 'نعم' if profile.accepts_misyar else 'لا' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>قبول الزواج التقليدي</th>
+                                            <td>{{ 'نعم' if profile.accepts_traditional else 'لا' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>وجود ولي أمر</th>
+                                            <td>{{ 'نعم' if profile.has_guardian else 'لا' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>طريقة التواصل المفضلة</th>
+                                            <td>{{ profile.preferred_communication or 'غير محدد' }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="tab-pane fade" id="bio">
+                                <h5 class="main-color mb-3">نبذة تعريفية</h5>
+                                <div class="card">
+                                    <div class="card-body">
+                                        {% if profile.bio %}
+                                            <p>{{ profile.bio }}</p>
+                                        {% else %}
+                                            <p class="text-muted">لم يتم إضافة نبذة تعريفية بعد.</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="py-4 bg-dark text-white text-center">
+        <div class="container">
+            <p class="mb-0">&copy; 2025 منصة تيسير الزواج. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
